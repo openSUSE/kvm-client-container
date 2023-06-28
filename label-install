@@ -1,0 +1,31 @@
+#!/bin/bash
+set -euo pipefail
+
+# Check for read only root filesystem
+is_read_only() {
+   [[ -n $(awk '$2 ~ /\/host$/ && $4 ~ /(^|,)ro($|,)/' /host/proc/mounts) ]]
+}
+
+INSTALL_PATH=$(is_read_only && echo "/host/usr/local/bin" || echo "/host/usr/bin")
+
+link_bin() {
+   BIN=$1
+   # Temporary PATH that `command -v` will use
+   local PATH=/host/usr/bin:/host/usr/local/bin
+   # Don't replace already installed binaries with symlinks
+   command -v ${BIN} || ln -srv ${INSTALL_PATH}/kvm-client-wrapper ${INSTALL_PATH}/${BIN}
+}
+
+virt_bins=()
+for package in libvirt-client libvirt-client-qemu python3-pvirsh python3-virt-scenario qemu-tools virt-install virt-top xorriso
+do
+   virt_bins+=($(basename -a $(rpm -ql $package | grep "/usr/bin" | xargs)))
+done
+
+# Install container wrapper script. Installed binaries will be linked to this executable
+cp -a /container/kvm-client-wrapper ${INSTALL_PATH}/
+
+for bin in "${virt_bins[@]}"
+do
+   link_bin ${bin}
+done

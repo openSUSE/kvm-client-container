@@ -1,0 +1,34 @@
+#!/bin/bash
+set -euo pipefail
+
+# Check for read only root filesystem
+is_read_only() {
+   [[ -n $(awk '$2 ~ /\/host$/ && $4 ~ /(^|,)ro($|,)/' /host/proc/mounts) ]]
+}
+
+INSTALL_PATH=$(is_read_only && echo "/host/usr/local/bin" || echo "/host/usr/bin")
+
+# Remove the symbolic links we installed. Should handle the case
+# where packages are installed directly on the host and replace
+# the symlinked binaries
+unlink_bin() {
+   if [[ -h ${INSTALL_PATH}/$1 ]]; then
+      echo "Unlinking $1"
+      rm ${INSTALL_PATH}/$1
+   else
+      echo "$1 is not a link, ignoring"
+   fi
+}
+
+virt_bins=()
+for package in libvirt-client libvirt-client-qemu python3-pvirsh python3-virt-scenario qemu-tools virt-install virt-top xorriso
+do
+   virt_bins+=($(basename -a $(rpm -ql $package | grep "/usr/bin" | xargs)))
+done
+
+for bin in "${virt_bins[@]}"
+do
+   unlink_bin ${bin}
+done
+
+rm -f ${INSTALL_PATH}/kvm-client-wrapper
