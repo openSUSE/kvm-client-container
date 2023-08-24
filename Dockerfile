@@ -28,6 +28,7 @@ LABEL com.suse.release-stage="prototype"
 
 # Don't forget to edit label-install/uninstall scripts when modifying installed packages
 RUN zypper install --no-recommends -y \
+              gawk \
               libvirt-client \
               libvirt-client-qemu \
               openssh-clients \
