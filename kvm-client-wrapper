@@ -10,4 +10,4 @@ RUN_LIBVIRT=$([[ -e /run/libvirt ]] && echo "-v /run/libvirt:/run/libvirt" || ec
 ETC_LIBVIRT_QEMU=$([[ -e /etc/libvirt/qemu ]] && echo "-v /etc/libvirt/qemu:/etc/libvirt/qemu" || echo "")
 LIBVIRT_IMAGES=$([[ -e /var/lib/libvirt/images ]] && echo "-v /var/lib/libvirt/images:/var/lib/libvirt/images" || echo "")
 
-exec podman run -it --rm --replace --net=host --userns=keep-id ${USER_HOME} ${RUN_LIBVIRT} ${ETC_LIBVIRT_QEMU} ${LIBVIRT_IMAGES} --name kvm-client-${BIN} registry.opensuse.org/virtualization/containerfile/suse/alp/workloads/kvm-client:latest ${BIN} ${ARGS}
+exec podman run -it --rm --replace --net=host --userns=keep-id ${USER_HOME} ${RUN_LIBVIRT} ${ETC_LIBVIRT_QEMU} ${LIBVIRT_IMAGES} --name kvm-client-${BIN} %CONTAINER_IMAGE% ${BIN} ${ARGS}
