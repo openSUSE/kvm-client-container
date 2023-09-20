@@ -23,7 +23,9 @@ do
 done
 
 # Install container wrapper script. Installed binaries will be linked to this executable
-cp -a /container/kvm-client-wrapper ${INSTALL_PATH}/
+sed -e "s,%CONTAINER_IMAGE%,${IMAGE},g" /container/kvm-client-wrapper > ${INSTALL_PATH}/kvm-client-wrapper
+chmod 755 ${INSTALL_PATH}/kvm-client-wrapper
+
 
 for bin in "${virt_bins[@]}"
 do
