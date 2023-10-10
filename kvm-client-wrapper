@@ -5,9 +5,8 @@ set -euo pipefail
 # "$0" will tell us which binary was executed. Now exec in the container instead
 BIN="$(basename $0)"
 ARGS="$@"
-USER_HOME="-v ${HOME:-"/"}:${HOME:-"/"}"
 RUN_LIBVIRT=$([[ -e /run/libvirt ]] && echo "-v /run/libvirt:/run/libvirt" || echo "")
 ETC_LIBVIRT_QEMU=$([[ -e /etc/libvirt/qemu ]] && echo "-v /etc/libvirt/qemu:/etc/libvirt/qemu" || echo "")
 LIBVIRT_IMAGES=$([[ -e /var/lib/libvirt/images ]] && echo "-v /var/lib/libvirt/images:/var/lib/libvirt/images" || echo "")
 
-exec podman run -it --rm --replace --net=host --userns=keep-id ${USER_HOME} ${RUN_LIBVIRT} ${ETC_LIBVIRT_QEMU} ${LIBVIRT_IMAGES} --name kvm-client-${BIN} %CONTAINER_IMAGE% ${BIN} ${ARGS}
+exec podman run -it --rm --replace --net=host --privileged ${RUN_LIBVIRT} ${ETC_LIBVIRT_QEMU} ${LIBVIRT_IMAGES} --name kvm-client-${BIN} %CONTAINER_IMAGE% ${BIN} ${ARGS}
