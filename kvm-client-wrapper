@@ -8,6 +8,6 @@ ARGS="$@"
 RUN_LIBVIRT=$([[ -e /run/libvirt ]] && echo "-v /run/libvirt:/run/libvirt" || echo "")
 ETC_LIBVIRT_QEMU=$([[ -e /etc/libvirt/qemu ]] && echo "-v /etc/libvirt/qemu:/etc/libvirt/qemu" || echo "")
 LIBVIRT_IMAGES=$([[ -e /var/lib/libvirt/images ]] && echo "-v /var/lib/libvirt/images:/var/lib/libvirt/images" || echo "")
-QEMU_DATA_DIR=$([[ -e /usr/share/qemu ]] && echo "-v /usr/share/qemu:/usr/share/qemu" || echo "")
+QEMU_FIRMWARE=$([[ -e /usr/share/qemu ]] && echo "-v /usr/share/qemu:/usr/share/qemu" || [[ -e /usr/local/share/qemu ]] && echo "-v /usr/local/share/qemu:/usr/share/qemu" || echo "")
 
-exec podman run -it --rm --replace --net=host --privileged ${RUN_LIBVIRT} ${ETC_LIBVIRT_QEMU} ${LIBVIRT_IMAGES} ${QEMU_DATA_DIR} --name kvm-client-${BIN} %CONTAINER_IMAGE% ${BIN} ${ARGS}
+exec podman run -it --rm --replace --net=host --privileged ${RUN_LIBVIRT} ${ETC_LIBVIRT_QEMU} ${LIBVIRT_IMAGES} ${QEMU_FIRMWARE} --name kvm-client-${BIN} %CONTAINER_IMAGE% ${BIN} ${ARGS}
